@@ -37,7 +37,7 @@ loginUser = async (req, res) =>{
                 .json({
                     errorMessage: "There is no account with this email address." });
         }
-        if(!bcrypt.compare(password, existingUser.passwordHash)) {
+        if(!(await bcrypt.compare(password, existingUser.passwordHash))) {
             return res
                     .status(403)
                     .json({
