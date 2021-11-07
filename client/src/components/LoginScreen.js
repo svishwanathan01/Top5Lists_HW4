@@ -29,6 +29,10 @@ export default function LoginScreen() {
       email: formData.get('email'),
       password: formData.get('password'),
     });
+    auth.loginUser({
+        email: formData.get('email'),
+        password: formData.get('password'),
+      });
   };
 
   return (
