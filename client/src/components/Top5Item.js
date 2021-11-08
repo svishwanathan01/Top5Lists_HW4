@@ -65,7 +65,7 @@ function Top5Item(props) {
     function handleKeyPress(event) {
         if (event.code === "Enter") {
             let id = event.target.id.substring("list-".length);
-            store.updateItem(id, text);
+            store.addUpdateItemTransaction(id, text);
             toggleEdit();
         }
     }
