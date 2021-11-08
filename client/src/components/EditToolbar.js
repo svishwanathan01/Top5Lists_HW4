@@ -32,12 +32,14 @@ function EditToolbar() {
             <Button 
                 id='undo-button'
                 onClick={handleUndo}
+                disabled={!store.canUndo()}
                 variant="contained">
                     <UndoIcon />
             </Button>
             <Button 
                 id='redo-button'
                 onClick={handleRedo}
+                disabled={!store.canRedo()}
                 variant="contained">
                     <RedoIcon />
             </Button>
