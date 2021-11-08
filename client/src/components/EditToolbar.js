@@ -44,7 +44,7 @@ function EditToolbar() {
                     <RedoIcon />
             </Button>
             <Button 
-                disabled={editStatus}
+                disabled={store.isItemEditActive}
                 id='close-button'
                 onClick={handleClose}
                 variant="contained">
