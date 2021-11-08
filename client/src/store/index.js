@@ -162,6 +162,19 @@ function GlobalStoreContextProvider(props) {
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
 
+    store.getUserList = async function(arr) {
+        let userArr = [];
+        for (let i = 0; i < arr.length; i++){
+            console.log(arr[i]);
+            const response = await api.getTop5ListById(arr[i]._id);
+            let userItem = response.data.top5List;
+            if (userItem.ownerEmail === auth.user.email){
+                userArr.push(userItem)
+            }
+        }
+        return userArr;
+    }
+
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
     store.changeListName = async function (id, newName) {
         let response = await api.getTop5ListById(id);
@@ -174,7 +187,7 @@ function GlobalStoreContextProvider(props) {
                     async function getListPairs(top5List) {
                         response = await api.getTop5ListPairs();
                         if (response.data.success) {
-                            let pairsArray = response.data.idNamePairs;
+                            let pairsArray = await store.getUserList(response.data.idNamePairs);
                             storeReducer({
                                 type: GlobalStoreActionType.CHANGE_LIST_NAME,
                                 payload: {
@@ -210,10 +223,12 @@ function GlobalStoreContextProvider(props) {
             items: ["?", "?", "?", "?", "?"],
             ownerEmail: auth.user.email
         };
+        console.log(payload);
         const response = await api.createTop5List(payload);
         if (response.data.success) {
             tps.clearAllTransactions();
             let newList = response.data.top5List;
+            console.log(response.data);
             storeReducer({
                 type: GlobalStoreActionType.CREATE_NEW_LIST,
                 payload: newList
@@ -232,7 +247,7 @@ function GlobalStoreContextProvider(props) {
     store.loadIdNamePairs = async function () {
         const response = await api.getTop5ListPairs();
         if (response.data.success) {
-            let pairsArray = response.data.idNamePairs;
+            let pairsArray = await store.getUserList(response.data.idNamePairs);
             storeReducer({
                 type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
                 payload: pairsArray
