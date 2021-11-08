@@ -6,6 +6,7 @@ import AuthContext from '../auth';
 import { useContext, useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
+import GlobalStoreContext from '../store';
 
 const style = {
   position: 'absolute',
@@ -22,28 +23,56 @@ const style = {
 export default function BasicModal() {
   const { auth } = useContext(AuthContext);
   const [open, setOpen] = useState(true);
+  const { store } = useContext(GlobalStoreContext);
 
   const hideError = () => {
       auth.hideError();
   }
 
-  let component = "";
-
-  if(auth.err) {
-    component = <div>
-                    <Modal
-                        open={open}
-                        onClose={hideError}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                    >
-                        <Box sx={style}>
-                            <Alert severity = "error">{auth.err}</Alert>
-                            <Button variant = "text" onClick = {hideError}> Close </Button>
-                        </Box>
-                    </Modal>
-                </div>
+  let cancelDeletion = () => {
+    store.unmarkListForDeletion();
   }
 
-  return (component);
+  let handleDeletion = () => {
+    store.deleteMarkedList();
+  }
+
+  if(auth.err) {
+    return ( 
+      <div>
+          <Modal
+              open={open}
+              onClose={hideError}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+          >
+              <Box sx={style}>
+                  <Alert severity = "error">{auth.err}</Alert>
+                  <Button variant = "text" onClick = {hideError}> Close </Button>
+              </Box>
+          </Modal>
+        </div>
+    )
+  }
+
+  if(store.listMarkedForDeletion){
+    return (
+      <div>
+          <Modal
+              open={open}
+              onClose={cancelDeletion}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+          >
+              <Box sx={style}>
+                  <Alert severity = "error"> Are you sure you want to delete the Top 5 List: {store.listMarkedForDeletion.name}?</Alert>
+                  <Button variant = "text" onClick = {handleDeletion}> Confirm </Button>
+                  <Button variant = "text" onClick = {cancelDeletion}> Cancel </Button>
+              </Box>
+          </Modal>
+      </div>
+    )
+  }
+
+  return '';
 } 
