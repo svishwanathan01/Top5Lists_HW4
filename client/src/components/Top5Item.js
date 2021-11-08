@@ -16,6 +16,7 @@ function Top5Item(props) {
     const [editActive, setEditActive] = useState(false);
     const [draggedTo, setDraggedTo] = useState(0);
     const [text, setText] = useState("");
+    let oldText = props.text;
 
     function handleDragStart(event, targetId) {
         event.dataTransfer.setData("item", targetId);
@@ -50,6 +51,8 @@ function Top5Item(props) {
     }
 
     function handleToggleEdit(event) {
+        // oldText = props.text;
+        console.log(oldText);
         event.stopPropagation();
         toggleEdit();
     }
@@ -64,8 +67,13 @@ function Top5Item(props) {
 
     function handleKeyPress(event) {
         if (event.code === "Enter") {
-            let id = event.target.id.substring("list-".length);
-            store.addUpdateItemTransaction(id, text);
+            console.log(oldText);
+            console.log(text);
+            console.log(event.target.value);
+            if (oldText != event.target.value){
+                let id = event.target.id.substring("item-".length);
+                store.addUpdateItemTransaction(id, text);
+            }   
             toggleEdit();
         }
     }
