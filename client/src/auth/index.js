@@ -10,13 +10,16 @@ export const AuthActionType = {
     GET_LOGGED_IN: "GET_LOGGED_IN",
     REGISTER_USER: "REGISTER_USER",
     LOGIN_USER: "LOGIN_USER",
-    LOGOUT_USER: "LOGOUT_USER"
+    LOGOUT_USER: "LOGOUT_USER",
+    SHOW_ERROR: "SHOW_ERROR",
+    HIDE_ERROR: "HIDE_ERROR"
 }
 
 function AuthContextProvider(props) {
     const [auth, setAuth] = useState({
         user: null,
-        loggedIn: false
+        loggedIn: false,
+        err: null
     });
     const history = useHistory();
 
@@ -30,25 +33,43 @@ function AuthContextProvider(props) {
             case AuthActionType.GET_LOGGED_IN: {
                 return setAuth({
                     user: payload.user,
-                    loggedIn: payload.loggedIn
+                    loggedIn: payload.loggedIn,
+                    err: null
                 });
             }
             case AuthActionType.REGISTER_USER: {
                 return setAuth({
                     user: payload.user,
-                    loggedIn: true
+                    loggedIn: true,
+                    err: null
                 })
             }
             case AuthActionType.LOGIN_USER: {
                 return setAuth({
                     user: payload.user,
-                    loggedIn: true
+                    loggedIn: true,
+                    err: null
                 })
             }
             case AuthActionType.LOGOUT_USER: {
                 return setAuth({
                     user: null,
-                    loggedIn: false
+                    loggedIn: false,
+                    err: null
+                })
+            }
+            case AuthActionType.SHOW_ERROR: {
+                return setAuth({
+                    // user: payload.user,
+                    // loggedIn: auth.loggedIn,
+                    err: payload.err
+                })
+            }
+            case AuthActionType.HIDE_ERROR: {
+                return setAuth({
+                    // user: payload.user,
+                    // loggedIn: false,
+                    err: null
                 })
             }
             default:
@@ -56,20 +77,37 @@ function AuthContextProvider(props) {
         }
     }
 
+    auth.hideError = function() {
+        authReducer({
+            type: AuthActionType.HIDE_ERROR,
+            payload: null
+        })
+    }
+
     auth.loginUser = async function (userData, store) {
-        const response = await api.loginUser(userData);
-        if (response.status === 200) {
+        try{
+            const response = await api.loginUser(userData);
+            if (response.status === 200) {
+                authReducer({
+                    type: AuthActionType.LOGIN_USER,
+                    payload: {
+                        loggedIn: response.data.loggedIn,
+                        user: response.data.user
+                    }
+                })
+                history.push("/");
+                if(typeof lastname !== "undefined"){
+                    store.loadIdNamePairs();
+                }
+            }
+        } catch (err){
             authReducer({
-                type: AuthActionType.LOGIN_USER,
+                type: AuthActionType.SHOW_ERROR,
                 payload: {
-                    loggedIn: response.data.loggedIn,
-                    user: response.data.user
+                    // user: response.data.user,
+                    err: err.response.data.errorMessage
                 }
             })
-            history.push("/");
-            if(typeof lastname !== "undefined"){
-                store.loadIdNamePairs();
-            }
         }
     }
 
@@ -105,17 +143,28 @@ function AuthContextProvider(props) {
     }
 
     auth.registerUser = async function(userData, store) {
-        const response = await api.registerUser(userData);      
-        if (response.status === 200) {
+        try{
+            const response = await api.registerUser(userData);      
+            if (response.status === 200) {
+                authReducer({
+                    type: AuthActionType.REGISTER_USER,
+                    payload: {
+                        user: response.data.user
+                    }
+                })
+                history.push("/");
+                store.loadIdNamePairs();
+            }
+        } catch(err){
             authReducer({
-                type: AuthActionType.REGISTER_USER,
+                type: AuthActionType.SHOW_ERROR,
                 payload: {
-                    user: response.data.user
+                    // user: response.data.user,
+                    err: err.response.data.errorMessage
                 }
             })
-            history.push("/");
-            store.loadIdNamePairs();
         }
+        
     }
 
     return (

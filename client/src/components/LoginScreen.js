@@ -14,7 +14,8 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import { GlobalStoreContext } from '../store'
+import { GlobalStoreContext } from '../store';
+import Modal from './Modal';
 
 export default function LoginScreen() {
     const { auth } = useContext(AuthContext);
@@ -39,6 +40,7 @@ export default function LoginScreen() {
 
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
+        <Modal />
         <Grid
           item
           xs={false}

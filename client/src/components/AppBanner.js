@@ -84,7 +84,10 @@ export default function AppBanner() {
         if (!loggedIn) {
             return <AccountCircle />;
         }
-        return "" + auth.user.firstName[0].toUpperCase() + auth.user.lastName[0].toUpperCase();
+        if (typeof auth.user !== "undefined"){
+            return "" + auth.user.firstName[0].toUpperCase() + auth.user.lastName[0].toUpperCase();
+        }
+        return <AccountCircle />;
     }
 
     return (
